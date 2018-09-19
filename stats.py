@@ -1,6 +1,4 @@
-'''nieuwe boosterpack.py, sinds eerste te jumbled is om nog in te werken
-fresh start
-nadat het klaar is met stats bijhouden, unpack boosters (andere module)
+'''datamining tradingbot stats
 '''
 
 import json
@@ -17,15 +15,13 @@ day = datetime.datetime.now()
 day = day.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
 epoch = day.timestamp()
 file = functions.load_id()
-inventory = requests.get('https://steamcommunity.com/inventory/{}/753/6?count=10'.format(file["steam64"]))
-
 
 def main():
     tradehist = tradedata()
-    dailytrades, totaltrades, avg, med, mode, donation = stats(tradehist)
-    highestcount, highestcountname, secondhighest, secondhighestname = mosttraded(tradehist)
-    friend, comment = other()
-    pass
+    basestats = stats(tradehist)
+    basestats.update(mosttraded(tradehist))
+    misc = other(tradehist)
+    writecsv(basestats)
 
 def tradedata():
     'fetch trade history'
@@ -51,18 +47,9 @@ def stats(tradehist):
     avg = round(statistics.mean(data), 2)
     med = round(statistics.median(data), 2)
     mode = statistics.mode(data)
+    high = max(data) 
 
-    #donations received
-    donation = 0
-    for trades in tradehist['response']['trades']:
-        try:
-            trades['assets_given']
-        except:
-            #this is a donation, don't count own profiles(exceptions)
-            if int(trades['steamid_other'])not in file['exceptions']:
-                donation += 1
-    return dailytrades, totaltrades, avg, med, mode, donation
-
+    return {'dailytrades':dailytrades, 'totaltrades':totaltrades, 'avg':avg, 'med':med, 'mode':mode, 'high':high}
 
 def mosttraded(tradehist):
     itemid = []
@@ -108,9 +95,9 @@ def mosttraded(tradehist):
             if value > secondhighest:
                 secondhighest = value
                 secondhighestname = key
-    return highestcount, highestcountname, secondhighest, secondhighestname
+    return {'highestcount':highestcount, 'highestcountname':highestcountname, 'secondhighest':secondhighest, 'secondhighestname':secondhighestname}
 
-def other():
+def other(tradehist):
     'other stats worth keeping, not directly related to trading'          
     #friends added
     friend = 0
@@ -132,11 +119,23 @@ def other():
         if int(tag.attrs['data-timestamp']) > int(epoch):
             comment += 1
     
+    #donations received
+    donation = 0
+    for trades in tradehist['response']['trades']:
+        try:
+            trades['assets_given']
+        except:
+            #this is a donation, don't count own profiles(exceptions)
+            if int(trades['steamid_other'])not in file['exceptions']:
+                donation += 1
+    
     return friend, comment
 
-            
+def writecsv(stats):
+    with open('log/stats.csv', 'a', newline='') as log:
+        writer = csv.writer(log)
+        writer.writerow([day.strftime("%Y-%m-%d"), stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],\
+        stats['mode'], stats['high'], stats['highestcountname'], stats['highestcount'], stats['secondhighestname'], stats['secondhighest']])
 
-def end():
-    pass
-
-main()
+if __name__ == '__main__':
+    main()
