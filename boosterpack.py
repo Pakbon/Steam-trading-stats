@@ -12,7 +12,7 @@ day = day.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1
 def main():
     counter, boosters = countbpacks()
     writecsv(counter, boosters)
-    #unpackbpacks()
+    unpackbpacks()
 
 def countbpacks():
     #scrape inventory
