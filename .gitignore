@@ -1,4 +1,5 @@
 *.json
+*.csv
 !example.json
 log/
 __pycache__/

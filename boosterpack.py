@@ -13,6 +13,7 @@ def main():
     counter, boosters = countbpacks()
     writecsv(counter, boosters)
     unpackbpacks()
+    #sql(counter, boosters)
 
 def countbpacks():
     #scrape inventory
@@ -53,6 +54,10 @@ def writecsv(counter, boosters):
     with open('log/boosterpack.csv', 'a', newline='') as log:
         writer = csv.writer(log)
         writer.writerow([day.strftime("%Y-%m-%d"), counter, boosters])
+
+def sql(counter, boosters):
+    date = '\'{}\''.format(day.strftime("%Y-%m-%d"))
+    functions.write_sql('boosterpacks', 'date, boosterpack_count, boosterpack_name1', '{},{},{}'.format(date, counter, boosters))
 
 if __name__ == '__main__':
     main()
