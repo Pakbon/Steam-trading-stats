@@ -12,13 +12,13 @@ import _mysql
 
 day = datetime.datetime.now()
 day = day.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
+epoch = day.timestamp()
 header = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           ' AppleWebKit/537.36 (KHTML, like Gecko)'
           ' Chrome/68.0.3440.84 Safari/537.36'}
 
 def login():
     'logs into steam, returns requests session with chrome headers and relevant cookies'
-
     steam = load_id()
     user = webauth.WebAuth(steam['username'], steam['password'])
     twofaurl = '{}2fa%20{}'.format(steam['asfcommand'], steam['bot'])
@@ -28,6 +28,12 @@ def login():
     steamsession = user.login(twofactor_code=twofa)
     steamsession.headers.update(header)
     return steamsession
+
+def yesterday():
+    Yday = datetime.datetime.now()
+    Yday = Yday.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
+    YdayUnix = Yday.timestamp()
+    return Yday, YdayUnix
 
 def load_id():
     'returns dict of steam.json'
@@ -51,3 +57,18 @@ def write_sql(table, column, value):
     steam = load_id()
     db = _mysql.connect(steam['mysqlhost'], steam['mysqluser'], steam['mysqlpassword'], steam['mysqldatabase'])
     db.query('insert into {} ({}) values ({})'.format(table, column, value))
+    'writes data in mysql. Takes 3 variables. table, column(s) and values. More than one column and value is possible'
+    steam = load_id()
+    db = _mysql.connect(steam['mysqlhost'], steam['mysqluser'], steam['mysqlpassword'], steam['mysqldatabase'])
+    db.query('insert into {} ({}) values ({})'.format(table, column, value))
+
+def tradedata():
+    'fetch trade history'
+    steam = load_id()
+    url = 'https://api.steampowered.com/IEconService/GetTradeHistory/v1/'
+    args = '?key={}&max_trades=500&start_after_time={}&navigating_back=1&include_failed=0&include_total=1'.format(steam["apikey"], int(epoch))
+    resp = requests.get(url+args)
+    if resp.status_code != 200:
+        raise Exception('Request failed with {}'.format(resp.status_code))
+    else:
+        return resp.json()

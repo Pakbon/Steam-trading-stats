@@ -11,7 +11,6 @@ from time import sleep
 
 
 import functions
-from stats import tradedata
 
 steam = functions.load_id()
 
@@ -63,12 +62,12 @@ def boosterpack():
         found = regex.search(items['name'])
         if found:
             name = items['name']
-            steamclassid = items['classid']
+            boosterclassid = items['classid']
             appid = items['market_fee_app']
             #compare with yesterdays trades
-            trades = tradedata()
-            for trades in trades['response']['trades']:
-                if trades['assets_received'][0]['classid'] == steamclassid:
+            tradedictio = functions.tradedata()
+            for trades in tradedictio['response']['trades']:
+                if trades['assets_received'][0]['classid'] == boosterclassid:
                     #came from bot:
                     steamid = trades['steamid_other']
                     if steamid not in steam['exceptions']:
@@ -116,6 +115,7 @@ def writecsv(GamesProfile, BoosterData):
             for boosters, data in BoosterData.items():
                 writer.writerow([functions.day.strftime("%Y-%m-%d"), boosters, data['received'], data['minowners'], data['maxowners']])
         
-
+def sql():
+    pass
 if __name__ == '__main__':
     main()

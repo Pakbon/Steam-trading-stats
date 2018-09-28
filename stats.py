@@ -17,21 +17,11 @@ epoch = day.timestamp()
 file = functions.load_id()
 
 def main():
-    tradehist = tradedata()
+    tradehist = functions.tradedata()
     basestats = stats(tradehist)
     basestats.update(mosttraded(tradehist))
-    misc = other(tradehist)
+    #misc = other(tradehist)
     writecsv(basestats)
-
-def tradedata():
-    'fetch trade history'
-    url = 'https://api.steampowered.com/IEconService/GetTradeHistory/v1/'
-    args = '?key={}&max_trades=500&start_after_time={}&navigating_back=1&include_failed=0&include_total=1'.format(file["apikey"], int(epoch))
-    resp = requests.get(url+args)
-    if resp.status_code != 200:
-        raise Exception('Request failed with {}'.format(resp.status_code))
-    else:
-        return resp.json()
 
 def stats(tradehist):
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'
