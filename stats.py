@@ -11,9 +11,6 @@ from bs4 import BeautifulSoup as bs
 
 import functions
 
-day = datetime.datetime.now()
-day = day.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
-epoch = day.timestamp()
 file = functions.load_id()
 
 def main():
@@ -21,7 +18,8 @@ def main():
     basestats = stats(tradehist)
     basestats.update(mosttraded(tradehist))
     #misc = other(tradehist)
-    writecsv(basestats)
+    #writecsv(basestats)
+    sql(basestats)
 
 def stats(tradehist):
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'
@@ -98,7 +96,7 @@ def other(tradehist):
         raise Exception('Request failed with {}'.format(friendslist.status_code))
     friendslist = friendslist.json()
     for people in friendslist['friendslist']['friends']:
-        if people['friend_since'] > day.timestamp():
+        if people['friend_since'] > functions.YdayUnix:
             friend += 1
     
     #comments posted
@@ -106,7 +104,7 @@ def other(tradehist):
     profile = requests.get('https://steamcommunity.com/id/{}'.format(file['vanityurl']))
     soup = bs(profile.text, 'html.parser')
     for tag in soup.select('.commentthread_comment_timestamp'):
-        if int(tag.attrs['data-timestamp']) > int(epoch):
+        if int(tag.attrs['data-timestamp']) > int(functions.YdayUnix):
             comment += 1
     
     #donations received
@@ -124,8 +122,14 @@ def other(tradehist):
 def writecsv(stats):
     with open('log/stats.csv', 'a', newline='') as log:
         writer = csv.writer(log)
-        writer.writerow([day.strftime("%Y-%m-%d"), stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],\
+        writer.writerow([functions.Yday.strftime("%Y-%m-%d"), stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],\
         stats['mode'], stats['high'], stats['highestcountname'], stats['highestcount'], stats['secondhighestname'], stats['secondhighest']])
+
+def sql(stats):
+    functions.write_sql('stats', \
+                        'date, total_trades, daily_trades, average_cards_per_trade, median_cards_per_trade, mode_cards_per_trade, highest_cards_per_trade, most_traded_set, most_traded_count, second_most_traded_set, second_most_traded_count', \
+                        "\'{}\', \'{}\', \'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'" \
+                        .format(functions.Yday, stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],stats['mode'], stats['high'], stats['highestcountname'], stats['highestcount'], stats['secondhighestname'], stats['secondhighest']))
 
 if __name__ == '__main__':
     main()

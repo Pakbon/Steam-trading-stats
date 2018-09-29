@@ -15,16 +15,17 @@ import functions
 steam = functions.load_id()
 
 def main():
-    GamesProfile = profile()
+    ProfileGames = profile()
     BoosterData = boosterpack()
-    writecsv(GamesProfile, BoosterData)
+    #writecsv(ProfileGames, BoosterData)
+    sql(ProfileGames, BoosterData)
 
 def profile():
-    'get profile level, eligible games'
+    'get profile level, eligible games, returns eligible games, level and steamid in dict'
     with open('accounts.csv') as accounts:
         readcsv = csv.reader(accounts)
         data = list(readcsv)
-        GamesProfile = {}
+        ProfileGames = {}
     for line in data:
         session = csvlogin(line)
         store = session.get('https://store.steampowered.com/stats/', headers=functions.header)
@@ -48,8 +49,8 @@ def profile():
         soup = bs(eligible.text,'html.parser')
         games = soup.select('.booster_eligibility_game')
         games = len(games)
-        GamesProfile[line[0]] = {'eligible' : games, 'level' : level, 'steamid' : steamid }
-    return GamesProfile
+        ProfileGames[line[0]] = {'eligible' : games, 'level' : level, 'steamid' : steamid }
+    return ProfileGames
         
 def boosterpack():
     'counts boosterpacks recieved per profile'
@@ -104,18 +105,24 @@ def csvlogin(line):
     return steamsession
 
 
-def writecsv(GamesProfile, BoosterData):
+def writecsv(ProfileGames, BoosterData):
     with open('log/extraprofile.csv', 'a', newline='') as log:
         writer = csv.writer(log)
-        for profile, stats in GamesProfile.items():
-            writer.writerow([functions.day.strftime("%Y-%m-%d"), profile, stats['steamid'], stats['level'], stats['eligible']])
+        for profile, stats in ProfileGames.items():
+            writer.writerow([functions.Yday.strftime("%Y-%m-%d"), profile, stats['steamid'], stats['level'], stats['eligible']])
     with open('log/extraboosterdata.csv', 'a', newline='') as log:
         writer = csv.writer(log)
         if BoosterData:
             for boosters, data in BoosterData.items():
-                writer.writerow([functions.day.strftime("%Y-%m-%d"), boosters, data['received'], data['minowners'], data['maxowners']])
+                writer.writerow([functions.Yday.strftime("%Y-%m-%d"), boosters, data['received'], data['minowners'], data['maxowners']])
         
-def sql():
-    pass
+def sql(ProfileGames, BoosterData):
+    #write data to profile_games table
+    for bot, stats in ProfileGames.items():
+        functions.write_sql('profile_games', 'date, bot, steamid, eligible_games, level', "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\'".format(functions.Yday, bot, stats['steamid'], stats['eligible'], stats['level']))
+
+    #write data to boosterpacks_extra
+    for bp, data in BoosterData:
+        functions.write_sql('boosterpacks_extra', 'date, recv_steamid, min_owners, max_owners, name', "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\'".format(functions.Yday, data['received'], data['minowners'], data['maxowners'], bp))
 if __name__ == '__main__':
     main()

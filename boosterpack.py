@@ -56,8 +56,10 @@ def writecsv(counter, boosters):
         writer.writerow([day.strftime("%Y-%m-%d"), counter, boosters])
 
 def sql(counter, boosters):
-    date = '\'{}\''.format(day.strftime("%Y-%m-%d"))
-    functions.write_sql('boosterpacks', 'date, boosterpack_count, boosterpack_name1', '{},{},{}'.format(date, counter, boosters))
+    table= ''
+    values = ''
+    functions.write_sql('boosterpacks', 'date, boosterpack_count, boosterpack_name1', \
+                        "\'{}\',\'{}\',\'{}\'".format(functions.Yday, counter, boosters))
 
 if __name__ == '__main__':
     main()
