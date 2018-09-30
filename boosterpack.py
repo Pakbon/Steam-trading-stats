@@ -14,8 +14,8 @@ def main():
 
 def countbpacks():
     #scrape inventory
-    file = functions.load_id()
-    url = 'https://steamcommunity.com/inventory/{}/753/6?count=10'.format(file["steam64"])
+    steam = functions.load_id()
+    url = 'https://steamcommunity.com/inventory/{}/753/6?count=10'.format(steam["steam64"])
     inventory = requests.get(url)
 
     #count boosters
@@ -35,8 +35,8 @@ def countbpacks():
 
 def unpackbpacks():
     'unpacks boosterpacks via ASF'
-    file = functions.load_id()
-    url = '{}unpack%20{}'.format(file["asfcommand"], file["bot"])
+    steam = functions.load_id()
+    url = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
     resp = requests.post(url, data='')
     resp = resp.json()
     if resp['Success']:

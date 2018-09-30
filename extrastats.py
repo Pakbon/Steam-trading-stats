@@ -60,14 +60,15 @@ def boosterpack():
     regex = re.compile(r'.*Booster Pack')
     BoosterData = {}
     for items in inventory['descriptions']:
+        steamid = ''
         found = regex.search(items['name'])
         if found:
             name = items['name']
             boosterclassid = items['classid']
             appid = items['market_fee_app']
             #compare with yesterdays trades
-            tradedictio = functions.tradedata()
-            for trades in tradedictio['response']['trades']:
+            tradehist = functions.tradedata()
+            for trades in tradehist['response']['trades']:
                 try: #trades with nothing received throws error
                     if trades['assets_received'][0]['classid'] == boosterclassid:
                         #came from bot:
@@ -75,11 +76,11 @@ def boosterpack():
                         if steamid not in steam['exceptions']:
                             #this is a donation, skip
                             continue
-                    else: #came from own
-                        steamid = steam['steam64']
                 except: #safe to skip and continue
                     continue
-            
+            if not steamid:
+                #came from own
+                steamid = steam['steam64']
             #using steamspy api to get owner info
             steamspy = 'http://steamspy.com/api.php?request=appdetails&appid={}'.format(appid)
             steamspy_answer = requests.get(steamspy, headers=functions.header)

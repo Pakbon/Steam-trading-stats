@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup as bs
 
 import functions
 
-file = functions.load_id()
+steam = functions.load_id()
 
 def main():
     tradehist = functions.tradedata()
@@ -42,9 +42,9 @@ def stats(tradehist):
 def mosttraded(tradehist):
     itemid = []
     url = 'https://api.steampowered.com/ISteamEconomy/GetAssetClassInfo/v1/'
-    args = '?key={}&appid=753&class_count=7'.format(file['apikey'])
+    args = '?key={}&appid=753&class_count=7'.format(steam['apikey'])
     for trades in tradehist['response']['trades']:
-        if int(trades['steamid_other']) in file['exceptions']:
+        if int(trades['steamid_other']) in steam['exceptions']:
             continue
         for items in trades['assets_received']:
             id = items['classid']
@@ -90,7 +90,7 @@ def other(tradehist):
     #friends added
     friend = 0
     url = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/'
-    args = '?key={}&steamid={}&relationship=friend'.format(file['apikey'], file['steam64'])
+    args = '?key={}&steamid={}&relationship=friend'.format(steam['apikey'], steam['steam64'])
     friendslist = requests.get(url+args)
     if friendslist.status_code != 200:
         raise Exception('Request failed with {}'.format(friendslist.status_code))
@@ -101,7 +101,7 @@ def other(tradehist):
     
     #comments posted
     comment = 0
-    profile = requests.get('https://steamcommunity.com/id/{}'.format(file['vanityurl']))
+    profile = requests.get('https://steamcommunity.com/id/{}'.format(steam['vanityurl']))
     soup = bs(profile.text, 'html.parser')
     for tag in soup.select('.commentthread_comment_timestamp'):
         if int(tag.attrs['data-timestamp']) > int(functions.YdayUnix):
@@ -114,7 +114,7 @@ def other(tradehist):
             trades['assets_given']
         except:
             #this is a donation, don't count own profiles(exceptions)
-            if int(trades['steamid_other'])not in file['exceptions']:
+            if int(trades['steamid_other'])not in steam['exceptions']:
                 donation += 1
     
     return friend, comment
