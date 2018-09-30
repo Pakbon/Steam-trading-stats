@@ -68,15 +68,17 @@ def boosterpack():
             #compare with yesterdays trades
             tradedictio = functions.tradedata()
             for trades in tradedictio['response']['trades']:
-                if trades['assets_received'][0]['classid'] == boosterclassid:
-                    #came from bot:
-                    steamid = trades['steamid_other']
-                    if steamid not in steam['exceptions']:
-                        #this is a donation, skip
-                        continue
-                else:
-                    #came from own
-                    steamid = steam['steam64']
+                try: #trades with nothing received throws error
+                    if trades['assets_received'][0]['classid'] == boosterclassid:
+                        #came from bot:
+                        steamid = trades['steamid_other']
+                        if steamid not in steam['exceptions']:
+                            #this is a donation, skip
+                            continue
+                    else: #came from own
+                        steamid = steam['steam64']
+                except: #safe to skip and continue
+                    continue
             
             #using steamspy api to get owner info
             steamspy = 'http://steamspy.com/api.php?request=appdetails&appid={}'.format(appid)
@@ -122,7 +124,8 @@ def sql(ProfileGames, BoosterData):
         functions.write_sql('profile_games', 'date, bot, steamid, eligible_games, level', "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\'".format(functions.Yday, bot, stats['steamid'], stats['eligible'], stats['level']))
 
     #write data to boosterpacks_extra
-    for bp, data in BoosterData:
-        functions.write_sql('boosterpacks_extra', 'date, recv_steamid, min_owners, max_owners, name', "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\'".format(functions.Yday, data['received'], data['minowners'], data['maxowners'], bp))
+    for bp, data in BoosterData.items():
+        functions.write_sql('boosterpacks_extra', 'date, recv_steamid, min_owners, max_owners, name', "\'{}\', \'{}\', \'{}\', \'{}\', \'{}\'".format(functions.Yday, data['received'], data['minowners'], data['maxowners'], bp[:-13]))
+
 if __name__ == '__main__':
     main()

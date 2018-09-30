@@ -6,14 +6,11 @@ import datetime
 
 import functions
 
-day = datetime.datetime.now()
-day = day.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
-
 def main():
     counter, boosters = countbpacks()
-    writecsv(counter, boosters)
+    #writecsv(counter, boosters)
     unpackbpacks()
-    #sql(counter, boosters)
+    sql(counter, boosters)
 
 def countbpacks():
     #scrape inventory
@@ -34,9 +31,6 @@ def countbpacks():
             counter += 1
     if len(boosters) == 0:
         boosters = ''
-    else:
-        boosters = ', '.join(map(str, boosters))
-    
     return counter, boosters
 
 def unpackbpacks():
@@ -53,13 +47,18 @@ def unpackbpacks():
 def writecsv(counter, boosters):
     with open('log/boosterpack.csv', 'a', newline='') as log:
         writer = csv.writer(log)
-        writer.writerow([day.strftime("%Y-%m-%d"), counter, boosters])
+        writer.writerow([functions.Yday, counter, boosters])
 
 def sql(counter, boosters):
-    table= ''
-    values = ''
-    functions.write_sql('boosterpacks', 'date, boosterpack_count, boosterpack_name1', \
-                        "\'{}\',\'{}\',\'{}\'".format(functions.Yday, counter, boosters))
+    columns, values = '', ''
+    columns += 'date, boosterpack_count'
+    values += "\'{}\', \'{}\'".format(functions.Yday, counter)
+    start = 0
+    for name in boosters:
+        columns += ',boosterpack_name{}'.format(str(start))
+        values += ", \'{}\'".format(name[:-13])
+        start += 1
+    functions.write_sql('boosterpacks', columns, values)
 
 if __name__ == '__main__':
     main()
