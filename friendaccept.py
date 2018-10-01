@@ -3,7 +3,6 @@ from bs4 import BeautifulSoup as bs
 import json
 import re
 import time
-from steam import webauth
 
 import functions
 
