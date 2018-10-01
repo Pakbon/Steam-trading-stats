@@ -32,7 +32,7 @@ def stats(tradehist):
     for trades in tradehist['response']['trades']:
         try: #errors out when nothing is received
             data += [len(trades['assets_received'])]
-        except: #safe to continue with for loop
+        except: #safe to continue with for loop 
             continue 
     data.sort()
     avg = round(statistics.mean(data), 2)
