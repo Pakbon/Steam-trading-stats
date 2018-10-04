@@ -3,3 +3,5 @@
 !example.json
 log/
 __pycache__/
+mailsend.py
+*.shv.*

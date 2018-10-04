@@ -15,7 +15,7 @@ def main():
 def souping(sesh):
     steam = functions.load_id()
     pending = sesh.get('https://steamcommunity.com/id/{}/friends/pending'.format(steam['vanityurl']), headers=functions.header)
-    soup = bs(pending.text)
+    soup = bs(pending.text, features='html.parser')
     fl_pending = soup.select('.invite_row')
     return fl_pending
 
@@ -25,7 +25,7 @@ def action(fl_pending, sesh):
     for profiles in fl_pending:
         attrs = profiles.attrs
         post = {
-            'sessionid' : sesh.cookies['sessionid'],
+            'sessionid' : sesh.cookies.get('sessionid', domain='steamcommunity.com'),
             'steamid' : steam['steam64'],
             'ajax' : '1',
             'action' : 'accept',
