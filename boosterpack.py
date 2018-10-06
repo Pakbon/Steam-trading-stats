@@ -5,7 +5,6 @@ import csv
 import datetime
 
 from bs4 import BeautifulSoup as bs
-from steam import webauth
 
 import functions
 
