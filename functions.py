@@ -18,11 +18,11 @@ header = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
           ' AppleWebKit/537.36 (KHTML, like Gecko)'
           ' Chrome/68.0.3440.84 Safari/537.36'}
 
-def login():
+def login(bot, username, password):
     'logs into steam, returns requests session with chrome headers and relevant cookies'
     steam = load_id()
-    user = webauth.WebAuth(steam['username'], steam['password'])
-    twofaurl = '{}2fa%20{}'.format(steam['asfcommand'], steam['bot'])
+    user = webauth.WebAuth(username, password)
+    twofaurl = '{}2fa%20{}'.format(steam['asfcommand'], bot)
     twofa = requests.post(twofaurl,data='')
     twofa = twofa.json()['Result'][-5:]
     sleep(2) #since it can take a while for asf to respond

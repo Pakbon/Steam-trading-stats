@@ -8,7 +8,8 @@ import functions
 
 def main():
     'run program'
-    sesh = functions.login()
+    steam = functions.load_id()
+    sesh = functions.login(steam['bot'], steam['username'], steam['password'])
     fl_pending = souping(sesh)
     action(fl_pending, sesh)
 

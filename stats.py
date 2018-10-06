@@ -19,12 +19,12 @@ def main():
     basestats.update(mosttraded(tradehist))
     #misc = other(tradehist)
     #writecsv(basestats)
-    sql(basestats)
+    #sql(basestats)
 
 def stats(tradehist):
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'
     #amount of trades
-    dailytrades = len(tradehist['response']['trades'])
+    dailytrades = len([i for i in tradehist['response']['trades'] if int(i['steamid_other']) not in steam['exceptions']])
     totaltrades = tradehist['response']['total_trades']
 
     #average, mode, median of amount of items per trade
