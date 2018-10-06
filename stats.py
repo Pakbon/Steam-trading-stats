@@ -19,7 +19,7 @@ def main():
     basestats.update(mosttraded(tradehist))
     #misc = other(tradehist)
     #writecsv(basestats)
-    #sql(basestats)
+    sql(basestats)
 
 def stats(tradehist):
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'

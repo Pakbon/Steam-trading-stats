@@ -11,6 +11,11 @@ import functions
 steam = functions.load_id()
 
 def main():
+    boosterpacks()
+    extract()
+
+def boosterpacks():
+    'count boosterpacks'
     #get inventory
     url = 'https://steamcommunity.com/inventory/{}/753/6?count=10'.format(steam["steam64"])
     inventory = requests.get(url)
@@ -71,6 +76,17 @@ def main():
 
         else: #no boosterpacks left
             break    
+
+def extract():
+    'unpacks boosterpacks via ASF'
+    steam = functions.load_id()
+    url = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
+    resp = requests.post(url, data='')
+    resp = resp.json()
+    if resp['Success']:	
+        return 0
+    else:
+        return 1
 
 if __name__ == '__main__':
     main()
