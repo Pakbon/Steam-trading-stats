@@ -33,14 +33,17 @@ def boosterpacks():
             for trades in tradehist['response']['trades']:
                 try: #trades with nothing received throws error
                     if trades['assets_received'][0]['classid'] == boosterclassid:
-                        #came from bot:
                         steamid = trades['steamid_other']
                         if steamid not in steam['exceptions']:
                             #this is a donation, skip
                             continue
-                except: #safe to skip and continue
+                        else: #came from bot
+                            break
+                except KeyError: #safe to skip and continue
                     continue
-            if not steamid: #came from own
+            try:
+                steamid
+            except UnboundLocalError: #came from own
                 steamid = steam['steam64']
 
             #amount of owners of the game
