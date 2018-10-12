@@ -10,8 +10,8 @@ from steam import webauth
 from time import sleep
 import _mysql
 
-Yday = datetime.datetime.now()
-Yday = Yday.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
+Tday = datetime.datetime.now()
+Yday = Tday.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
 YdayUnix = Yday.timestamp()
 
 header = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'

@@ -29,11 +29,8 @@ def stats(tradehist):
 
     #average, mode, median of amount of items per trade
     data = []
-    for trades in tradehist['response']['trades']:
-        try: #errors out when nothing is received
-            data += [len(trades['assets_received'])]
-        except: #safe to continue with for loop 
-            continue 
+    trades = [n for n in tradehist['response']['trades'] if int(n['steamid_other']) not in steam['exceptions']]
+    data += [len(trades['assets_received'])]
     data.sort()
     avg = round(statistics.mean(data), 2)
     med = round(statistics.median(data), 2)

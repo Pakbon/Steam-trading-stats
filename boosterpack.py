@@ -74,7 +74,7 @@ def boosterpacks():
             
             #write data to sql
             columns = 'date, boosterpack, min_owners, max_owners, received_from, level, eligible_games'
-            values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Yday, game_name, owners_min, owners_max, steamid, level, games)
+            values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Tday, game_name, owners_min, owners_max, steamid, level, games)
             functions.write_sql('boosterpack', columns, values)
 
         else: #no boosterpacks left
