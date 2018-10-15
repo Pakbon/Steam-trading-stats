@@ -51,6 +51,7 @@ def boosterpacks():
             steamspy_answer = requests.get(steamspy, headers=functions.header)
             steamspy_answer = steamspy_answer.json()
             game_name = steamspy_answer['name']
+            game_name = game_name.replace("\'", "")
             owners = steamspy_answer['owners']
             regowners = re.compile(r'(\d+(,\d+)*)')
             owners_min, owners_max = regowners.findall(owners)[0][0], regowners.findall(owners)[1][0]
