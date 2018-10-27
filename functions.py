@@ -47,11 +47,24 @@ def post_comment(action, othername, steamid, steamsession, custcomment=''):
     postdata = {'comment' : comment, 'count' : 6, 'sessionid' : steamsession.cookies.get('sessionid', domain='steamcommunity.com')}
     steamsession.post(commenturl, data=postdata)
 
-def write_sql(table, column, value):
-    'writes data in mysql. Takes 3 variables. table, column(s) and values. More than one column and value is possible'
+def login_sql():
     steam = load_id()
     db = _mysql.connect(steam['mysqlhost'], steam['mysqluser'], steam['mysqlpassword'], steam['mysqldatabase'])
-    db.query('insert into {} ({}) values ({})'.format(table, column, value))
+    return db
+
+def write_sql(table, column, value):
+    'writes data in mysql. Takes 3 variables. table, column(s) and values. More than one column and value is possible'
+    db = login_sql()
+    db.query('INSERT INTO {} ({}) VALUES ({})'.format(table, column, value))
+
+def read_sql(table, column='*', where=''):
+    'reads data from mysql. default for column= *. where= WHERE "<column>=<value>". returns a tuple of dicts each sql row being 1 dict, where key=column'
+    db = login_sql()
+    if where:
+        where = 'WHERE ' + where
+    db.query('SELECT {} FROM {} {}'.format(column, table, where ))
+    result = db.store_result()
+    return result.fetch_row(maxrows=0, how=1)
 
 def tradedata():
     'fetch trade history'
