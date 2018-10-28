@@ -22,11 +22,13 @@ def profilepost(stats, boosterpacks):
     with open('x.json') as file:
         payload = json.loads(file.read())
     payload['rgShowcaseConfig[8][0][title]'] = 'Stats for {}'.format(functions.Yday.date())
-    payload['rgShowcaseConfig[8][0][notes]'] += 'Trades: [b]{}[/b]\n'.format(stats[0]['daily_trades'])
+    payload['rgShowcaseConfig[8][0][notes]'] += 'Trades completed: [b]{}[/b]\n'.format(stats[0]['daily_trades'])
     payload['rgShowcaseConfig[8][0][notes]'] += 'Average cards per trade: [b]{}[/b]\n'.format(stats[0]['average_cards_per_trade'])
+    payload['rgShowcaseConfig[8][0][notes]'] += 'Most cards in one trade: [b]{}[/b]\n'.format(stats[0]['highest_cards_per_trade'])
     payload['rgShowcaseConfig[8][0][notes]'] += 'Most traded set by cards: [b]{}[/b]\n'.format(stats[0]['most_traded_set'][:-13])
     payload['rgShowcaseConfig[8][0][notes]'] += '2nd most traded set by cards: [b]{}[/b]\n'.format(stats[0]['second_most_traded_set'][:-13])
-    payload['rgShowcaseConfig[8][0][notes]'] += '\nBoosterpacks received: [b]{}[/b]\n'.format(len(boosterpacks))
+    payload['rgShowcaseConfig[8][0][notes]'] += '\nMisc:\n'
+    payload['rgShowcaseConfig[8][0][notes]'] += 'Boosterpacks received: [b]{}[/b]\n'.format(len(boosterpacks))
     try:
         loadfile = shelve.open('paydaytwo.shv')
         payload['rgShowcaseConfig[8][0][notes]'] += 'Times commented on Payday 2 news: [b]{}[/b]\n'.format(loadfile[functions.Yday.date().strftime('%Y-%m-%d')])
