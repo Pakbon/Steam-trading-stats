@@ -19,12 +19,12 @@ def main():
         if found:
             creds = functions.login(steam['bot'],steam['username'],steam['password'])
             commenter(creds, announceurl, found)
-            savefile = shelve.open('paydaytwo.shv')
-            if not savefile[functions.Tday.date()]:
-                savefile[functions.Tday.date()] = 1
-            else:
-                savefile[functions.Tday.date()] += 1                
-            break
+            savefile = shelve.open('paydaytwo.shv')                
+            try:
+                savefile[functions.Tday.date().strftime('%Y-%m-%d')] += 1                
+            except:
+                savefile[functions.Tday.date().strftime('%Y-%m-%d')] = 1
+            break   
         else: #try a few more time before giving up, interval of 10 seconds
             counter += 1
             if counter == 12:
@@ -63,7 +63,7 @@ def commenter(creds, announceurl, name):
     articleid = str(announceurl[-19:]) +'/'
     url = 'https://steamcommunity.com/comment/ClanAnnouncement/post/103582791433980119/' + articleid
     phrases = ['As it may be', 'Maybe it is', 'Conceivably', 'Perhaps it is', 'It possibly is', 'Conceivable', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'Feasible']
-    payload = {'comment' : name + '\n' + choice(phrases), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
+    payload = {'comment' : '@' + name + '\n' + choice(phrases), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
     creds.post(url, headers=functions.header, data=payload)
 
 main()
