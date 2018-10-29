@@ -51,7 +51,7 @@ def comments(art):
     #if found, return name of commenter
     soup = bs(art, features='html.parser')
     replies = soup.select('.commentthread_comment')
-    regex = replies[0].find(string=re.compile(r'^[\s]*((((d[ea]{1,2}d)|a?li(v|f)e)|([game]{3,4})).?){2}', re.IGNORECASE))
+    regex = replies[0].find(string=re.compile(r'^[\s]*(((d[ea]{1,2}d)|([game]{3,4})).?){2}', re.IGNORECASE))
     if regex:
         name = replies[0].bdi.contents[0]
         return name 
@@ -62,7 +62,7 @@ def commenter(creds, announceurl, name):
     #post comment
     articleid = str(announceurl[-19:]) +'/'
     url = 'https://steamcommunity.com/comment/ClanAnnouncement/post/103582791433980119/' + articleid
-    phrases = ['As it may be', 'Maybe it is', 'Conceivably', 'Perhaps it is', 'It possibly is', 'Conceivable', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'Feasible']
+    phrases = ['As it may be', 'Maybe it is', 'It conceivably is', 'Perhaps it is', 'It possibly is', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'It feasibly is']
     payload = {'comment' : '@' + name + '\n' + choice(phrases), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
     creds.post(url, headers=functions.header, data=payload)
 
