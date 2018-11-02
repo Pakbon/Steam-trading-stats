@@ -12,7 +12,7 @@ steam = functions.load_id()
 
 def main():
     boosterpacks()
-#    extract()
+    extract()
 
 def boosterpacks():
     'count boosterpacks'
@@ -24,6 +24,7 @@ def boosterpacks():
     #find boosterpacks in inventory
     regex = re.compile(r'.*Booster Pack')
     for items in inventory['descriptions']:
+        steamid = ''
         if items['classid'] == '667924416': #gems break the script and can be safely skipped
             continue
         found = regex.search(items['name'])
@@ -32,20 +33,16 @@ def boosterpacks():
             boosterclassid = items['classid']
             boosterappid = items['market_fee_app']
             tradehist = functions.tradedata()
-            for trades in tradehist['response']['trades']:
-                try: #trades with nothing received throws error
-                    if trades['assets_received'][0]['classid'] == boosterclassid:
+            tradelist = [trades for trades in tradehist['response']['trades'] if trades['steamid_other'] in str(steam['exceptions'])if 'assets_received' in trades]
+            for trades in tradelist:
+                for assets in trades['assets_received']:
+                    if assets['classid'] == boosterclassid:
                         steamid = trades['steamid_other']
-                        if steamid not in steam['exceptions']:
-                            #this is a donation, skip
-                            continue
-                        else: #came from bot
-                            break
-                except KeyError: #safe to skip and continue
-                    continue
-            try:
-                steamid
-            except UnboundLocalError: #came from own
+                        break
+                    else:
+                        continue
+                break
+            if not steamid:
                 steamid = steam['steam64']
 
             #amount of owners of the game
