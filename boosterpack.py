@@ -12,7 +12,7 @@ steam = functions.load_id()
 
 def main():
     boosterpacks()
-    extract()
+#    extract()
 
 def boosterpacks():
     'count boosterpacks'
@@ -24,6 +24,8 @@ def boosterpacks():
     #find boosterpacks in inventory
     regex = re.compile(r'.*Booster Pack')
     for items in inventory['descriptions']:
+        if items['classid'] == '667924416': #gems break the script and can be safely skipped
+            continue
         found = regex.search(items['name'])
         if found:
             #find account it came from
