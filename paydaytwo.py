@@ -57,7 +57,7 @@ def comments(art):
         name = replies[0].bdi.contents[0]
         return name, 0
     
-    regex = replies[0].find(string=re.compile(r'^[\s]*F+[\s]*'))
+    regex = replies[8].find(string=re.compile(r'^[\s]*F{1,}[\s]+'))
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 1
@@ -82,7 +82,7 @@ def commenter(creds, announceurl, name, options=0):
     phrases = {
         0:['As it may be', 'Maybe it is', 'It conceivably is', 'Perhaps it is', 'It possibly is', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'It feasibly is'],
         1:['Thank you for paying your respects', 'Respect has been paid', 'You have paid your respects'],
-        2:['perhaps he\'s wondering why someone would shoot a man, before throwing him out of a plane?','No one cared who I was until I put on the mask.','It would be extremely painful.','Crashing this plane... with no survivors!'],
+        2:['Perhaps he\'s wondering why someone would shoot a man, before throwing him out of a plane?','No one cared who I was until I put on the mask.','It would be extremely painful.','Crashing this plane... with no survivors!'],
         3:['As it may not be', 'Maybe it is\'nt','Maybe not', 'Perhaps it is not']
     }
     payload = {'comment' : '@' + name + '\n' + choice(phrases[options]), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
