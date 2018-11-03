@@ -15,10 +15,10 @@ def main():
     counter = 0
     while True:
         announceurl, art = article()
-        found = comments(art)
+        found, options = comments(art)
         if found:
             creds = functions.login(steam['bot'],steam['username'],steam['password'])
-            commenter(creds, announceurl, found)
+            commenter(creds, announceurl, found, options=options)
             savefile = shelve.open('paydaytwo.shv')                
             try:
                 savefile[functions.Tday.date().strftime('%Y-%m-%d')] += 1                
@@ -51,18 +51,28 @@ def comments(art):
     #if found, return name of commenter
     soup = bs(art, features='html.parser')
     replies = soup.select('.commentthread_comment')
+    
     regex = replies[0].find(string=re.compile(r'^[\s]*(((d[ea]{1,2}d)|([game]{3,4})).?){2}', re.IGNORECASE))
     if regex:
         name = replies[0].bdi.contents[0]
-        return name 
+        return name, 0
+    
+    regex = replies[0].find(string=re.compile(r'^[\s]*F[\s]*'))
+    if regex:
+        name = replies[0].bdi.contents[0]
+        return name, 1
+    
     else:
-        return 0
+        return 0, 0
 
-def commenter(creds, announceurl, name):
+def commenter(creds, announceurl, name, options=0):
     #post comment
     articleid = str(announceurl[-19:]) +'/'
     url = 'https://steamcommunity.com/comment/ClanAnnouncement/post/103582791433980119/' + articleid
-    phrases = ['As it may be', 'Maybe it is', 'It conceivably is', 'Perhaps it is', 'It possibly is', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'It feasibly is']
+    if options == 1:
+        phrases = ['Thank you for paying your respects', 'Respect has been paid', 'You have paid your respects']
+    else:
+        phrases = ['As it may be', 'Maybe it is', 'It conceivably is', 'Perhaps it is', 'It possibly is', 'Perchance it is', 'Perhaps it is', 'It might be', 'It could be', 'It can be', 'It feasibly is']
     payload = {'comment' : '@' + name + '\n' + choice(phrases), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
     creds.post(url, headers=functions.header, data=payload)
 
