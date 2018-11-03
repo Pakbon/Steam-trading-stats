@@ -57,7 +57,7 @@ def comments(art):
         name = replies[0].bdi.contents[0]
         return name, 0
     
-    regex = replies[8].find(string=re.compile(r'^[\s]*F{1,}[\s]+'))
+    regex = replies[0].find(string=re.compile(r'^[\s]*F{1,}[\s]+'))
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 1
