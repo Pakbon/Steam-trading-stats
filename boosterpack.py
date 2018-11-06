@@ -14,8 +14,10 @@ logging.debug('log start')
 steam = functions.load_id()
 
 def main():
-    boosterpacks()
-    extract()
+    boosteramount = boosterpacks()
+    if boosteramount > 0:
+        extract()
+    logging.debug('log end')
 
 def boosterpacks():
     'count boosterpacks'
@@ -26,13 +28,15 @@ def boosterpacks():
 
     #find boosterpacks in inventory
     regex = re.compile(r'.*Booster Pack')
-    logging.debug('Looking for boosterpacks in inventory')
+    logging.debug('looking for boosterpacks in inventory')
+    boosteramount = 0
     for items in inventory['descriptions']:
         steamid = ''
         if items['classid'] == '667924416': #gems break the script and can be safely skipped
             continue
         found = regex.search(items['name'])
         if found:
+            boosteramount += 1
             logging.debug('Found boosterpack {} in inventory'.format(items['market_fee_app']))
             logging.debug('boosterpack classid = {}'.format(boosterclassid))
             #find account it came from
@@ -90,6 +94,7 @@ def boosterpacks():
         else: #no boosterpacks left
             logging.debug('no more boosterpacks left')
             break    
+    return boosteramount
 
 def extract():
     'unpacks boosterpacks via ASF'
