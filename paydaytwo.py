@@ -56,7 +56,7 @@ def comments(art):
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 0
-    
+
     regex = replies[0].find(string=re.compile(r'^[\s]*F{1,}[\s]+'))
     if regex:
         name = replies[0].bdi.contents[0]
@@ -67,7 +67,7 @@ def comments(art):
         name = replies[0].bdi.contents[0]
         return name, 2
     
-    regex = replies[0].find(string=re.compile(r'^[\s](a?li[vf]{1}e game|und[ea]{1,2}d [game]{3,4})[\s]*', re.IGNORECASE))
+    regex = replies[0].find(string=re.compile(r'^[\s](a?li[vf]{1}e|und[ea]{1,2}d) [game]{3,4}[\s]*', re.IGNORECASE))
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 3
