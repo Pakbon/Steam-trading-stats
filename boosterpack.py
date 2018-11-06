@@ -3,11 +3,14 @@ import requests
 import json
 import csv
 import datetime
+import logging
 
 from bs4 import BeautifulSoup as bs
 
 import functions
 
+logging.basicConfig(filename='boosterpack.log', level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
+logging.debug('log start')
 steam = functions.load_id()
 
 def main():
@@ -23,26 +26,32 @@ def boosterpacks():
 
     #find boosterpacks in inventory
     regex = re.compile(r'.*Booster Pack')
+    logging.debug('Looking for boosterpacks in inventory')
     for items in inventory['descriptions']:
         steamid = ''
         if items['classid'] == '667924416': #gems break the script and can be safely skipped
             continue
         found = regex.search(items['name'])
         if found:
+            logging.debug('Found boosterpack {} in inventory'.format(items['market_fee_app']))
+            logging.debug('boosterpack classid = {}'.format(boosterclassid))
             #find account it came from
             boosterclassid = items['classid']
             boosterappid = items['market_fee_app']
             tradehist = functions.tradedata()
             tradelist = [trades for trades in tradehist['response']['trades'] if trades['steamid_other'] in str(steam['exceptions'])if 'assets_received' in trades]
+            logging.debug('Looking in trades for boosterpack')
             for trades in tradelist:
                 for assets in trades['assets_received']:
                     if assets['classid'] == boosterclassid:
                         steamid = trades['steamid_other']
+                        logging.debug('Found in trades: steam64={}'.format(steamid))
                         break
                     else:
                         continue
                 break
             if not steamid:
+                logging.debug('Not found in trades, boosterpack dropped from main bot')
                 steamid = steam['steam64']
 
             #amount of owners of the game
@@ -73,11 +82,13 @@ def boosterpacks():
                 games = len(games)
             
             #write data to sql
+            logging.debug('Writing to SQL')
             columns = 'date, boosterpack, min_owners, max_owners, received_from, level, eligible_games'
             values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Tday, game_name, owners_min, owners_max, steamid, level, games)
             functions.write_sql('boosterpack', columns, values)
 
         else: #no boosterpacks left
+            logging.debug('no more boosterpacks left')
             break    
 
 def extract():
