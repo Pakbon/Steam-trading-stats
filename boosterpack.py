@@ -38,9 +38,9 @@ def boosterpacks():
         if found:
             boosteramount += 1
             logging.debug('Found boosterpack {} in inventory'.format(items['market_fee_app']))
-            logging.debug('boosterpack classid = {}'.format(boosterclassid))
             #find account it came from
             boosterclassid = items['classid']
+            logging.debug('boosterpack classid = {}'.format(boosterclassid))
             boosterappid = items['market_fee_app']
             tradehist = functions.tradedata()
             tradelist = [trades for trades in tradehist['response']['trades'] if trades['steamid_other'] in str(steam['exceptions'])if 'assets_received' in trades]
