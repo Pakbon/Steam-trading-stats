@@ -25,8 +25,8 @@ def profilepost(stats, boosterpacks):
     payload['rgShowcaseConfig[8][0][notes]'] += 'Trades completed: [b]{}[/b]'.format(stats[0]['daily_trades'])
     payload['rgShowcaseConfig[8][0][notes]'] += '\nAverage cards per trade: [b]{}[/b]'.format(stats[0]['average_cards_per_trade'])
     payload['rgShowcaseConfig[8][0][notes]'] += '\nMost cards in one trade: [b]{}[/b]'.format(stats[0]['highest_cards_per_trade'])
-    payload['rgShowcaseConfig[8][0][notes]'] += '\nMost traded set by cards: [b]{}[/b]'.format(stats[0]['most_traded_set'][:-13])
-    payload['rgShowcaseConfig[8][0][notes]'] += '\n2nd most traded set: [b]{}[/b]'.format(stats[0]['second_most_traded_set'][:-13])
+    payload['rgShowcaseConfig[8][0][notes]'] += '\nMost traded set by cards: [b]{}[/b]'.format(stats[0]['most_traded_set'][:-13].decode('utf-8'))
+    payload['rgShowcaseConfig[8][0][notes]'] += '\n2nd most traded set: [b]{}[/b]'.format(stats[0]['second_most_traded_set'][:-13].decode('utf-8'))
     payload['rgShowcaseConfig[8][0][notes]'] += '\n\nMisc:'
     payload['rgShowcaseConfig[8][0][notes]'] += '\nBoosterpacks received: [b]{}[/b]'.format(len(boosterpacks))
     try:
