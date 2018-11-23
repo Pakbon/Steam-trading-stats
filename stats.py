@@ -1,5 +1,5 @@
-'''datamining tradingbot stats
-'''
+"""datamining tradingbot stats
+"""
 
 import json
 import csv
@@ -15,11 +15,11 @@ steam = functions.load_id()
 
 def main():
     tradehist = functions.tradedata()
-    basestats = stats(tradehist)
-    basestats.update(mosttraded(tradehist))
-    #misc = other(tradehist)
-    #writecsv(basestats)
-    sql(basestats)
+    statsdict = stats(tradehist)
+    statsdict.update(mosttradedset(tradehist))
+    statsdict.update(otherstats(tradehist))
+    #miscstats = misc(tradehist)
+    sql(statsdict)
 
 def stats(tradehist):
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'
@@ -40,9 +40,16 @@ def stats(tradehist):
     mode = statistics.mode(data)
     high = max(data) 
 
-    return {'dailytrades':dailytrades, 'totaltrades':totaltrades, 'avg':avg, 'med':med, 'mode':mode, 'high':high}
+    return {
+        'dailytrades':dailytrades,
+        'totaltrades':totaltrades,
+        'avg':avg,
+        'med':med,
+        'mode':mode,
+        'high':high
+    }
 
-def mosttraded(tradehist):
+def mosttradedset(tradehist):
     itemid = []
     url = 'https://api.steampowered.com/ISteamEconomy/GetAssetClassInfo/v1/'
     args = '?key={}&appid=753&class_count=7'.format(steam['apikey'])
@@ -67,11 +74,8 @@ def mosttraded(tradehist):
                     cardset = r['result'][n]['type']
                 except:
                     continue
-                try:
-                    cardset in dictio
-                    dictio[cardset] += 1
-                except:
-                    dictio[cardset] = 1
+                dictio.setdefault(cardset, 0)
+                dictio[cardset] += 1
             counter = 0
             idargs = ''
     highestcount = 0
@@ -86,9 +90,41 @@ def mosttraded(tradehist):
             if value > secondhighest:
                 secondhighest = value
                 secondhighestname = key
-    return {'highestcount':highestcount, 'highestcountname':highestcountname, 'secondhighest':secondhighest, 'secondhighestname':secondhighestname}
+    return {
+        'highestcount':highestcount,
+        'highestcountname':highestcountname,
+        'secondhighest':secondhighest,
+        'secondhighestname':secondhighestname
+    }
 
-def other(tradehist):
+def otherstats(tradehist):
+    'other trading related stats'
+    #total cards traded
+    tradehist = [i for i in tradehist['response']['trades'] if int(i['steamid_other']) not in steam['exceptions']]
+    totalcards = 0
+    for trades in tradehist:
+        totalcards += len(trades['assets_given'])
+    
+    #most trades and amount of cards traded by a single account
+    accountdict = {}
+    for trades in tradehist:
+        accountdict.setdefault(trades['steamid_other'], [0, 0])
+        accountdict[trades['steamid_other']][0] += 1
+        accountdict[trades['steamid_other']][1] += len(trades['assets_given'])
+    #find most trades in accountdict
+    uniqueaccounts = len(accountdict)
+    mosttradedaccount = max(accountdict)
+    tradecount = accountdict[mosttradedaccount][0]
+    cardamount = accountdict[mosttradedaccount][1]
+    return {
+        'totalcards' : totalcards,
+        'uniqueaccounts' : uniqueaccounts,
+        'mosttradedaccount' : mosttradedaccount,
+        'tradecount' : tradecount,
+        'cardamount' : cardamount
+    }
+
+def misc(tradehist):
     'other stats worth keeping, not directly related to trading'          
     #friends added
     friend = 0
@@ -122,17 +158,43 @@ def other(tradehist):
     
     return friend, comment
 
-def writecsv(stats):
-    with open('log/stats.csv', 'a', newline='') as log:
-        writer = csv.writer(log)
-        writer.writerow([functions.Yday.strftime("%Y-%m-%d"), stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],\
-        stats['mode'], stats['high'], stats['highestcountname'], stats['highestcount'], stats['secondhighestname'], stats['secondhighest']])
-
 def sql(stats):
     functions.write_sql('stats', \
-                        'date, total_trades, daily_trades, average_cards_per_trade, median_cards_per_trade, mode_cards_per_trade, highest_cards_per_trade, most_traded_set, most_traded_count, second_most_traded_set, second_most_traded_count', \
-                        "\'{}\', \'{}\', \'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'" \
-                        .format(functions.Yday, stats['totaltrades'], stats['dailytrades'], stats['avg'], stats['med'],stats['mode'], stats['high'], stats['highestcountname'], stats['highestcount'], stats['secondhighestname'], stats['secondhighest']))
+                        'date, total_trades, \
+                        daily_trades, average_cards_per_trade, \
+                        median_cards_per_trade, mode_cards_per_trade, \
+                        highest_cards_per_trade, most_traded_set, \
+                        most_traded_count, second_most_traded_set, \
+                        second_most_traded_count, total_cards, \
+                        unique_accounts, most_trades, \
+                        most_trades_count, most_trades_cards', \
+                        "\'{}\', \'{}\', \
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\',\
+                        \'{}\',\'{}\'" \
+                        .format(
+                            functions.Yday,
+                            stats['totaltrades'],
+                            stats['dailytrades'],
+                            stats['avg'],
+                            stats['med'],
+                            stats['mode'],
+                            stats['high'],
+                            stats['highestcountname'],
+                            stats['highestcount'],
+                            stats['secondhighestname'],
+                            stats['secondhighest'],
+                            stats['totalcards'],
+                            stats['uniqueaccounts'],
+                            stats['mosttradedaccount'],
+                            stats['tradecount'],
+                            stats['cardamount']))
+
+                            
 
 if __name__ == '__main__':
     main()
