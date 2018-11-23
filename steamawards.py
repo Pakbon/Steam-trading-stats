@@ -1,3 +1,6 @@
+'''Script to automatically get steamawards badges on multiple accounts
+'''
+
 import requests
 import json
 import csv
@@ -6,6 +9,7 @@ from time import sleep
 from random import choice
 
 import functions
+
 
 def main():
     with open('accounts.csv') as accountfile:
@@ -16,13 +20,15 @@ def main():
             tasks(session)
             sleep(15)
 
+
 def tasks(session):
-    nominatedid = (644930, 387290, 252950, 33820958, 368340, 553310, 34900, 440)
+    nominatedid = (644930, 387290, 252950, 33820958,
+                   368340, 553310, 34900, 440)
     awarddict = {
-        'sessionid' : session.cookies.get('sessionid', domain='store.steampowered.com'),
-        'nominatedid' : 0,
-        'categoryid' : 0, 
-        'source' : 3 
+        'sessionid': session.cookies.get('sessionid', domain='store.steampowered.com'),
+        'nominatedid': 0,
+        'categoryid': 0,
+        'source': 3
     }
 
     for n in range(8):
@@ -40,17 +46,18 @@ def tasks(session):
         'I like the mechanics'
     )
     reviewdict = {
-        'appid' : 440,
-        'steamworksappid' : 440,
-        'comment' : choice(reviewcomment),
-        'is_public' : 'false',
-        'language' : 'english',
-        'received_compensation' : 0,
-        'disable_comments' : 1,
-        'sessionid' : session.cookies.get('sessionid', domain='store.steampowered.com')
+        'appid': 440,
+        'steamworksappid': 440,
+        'comment': choice(reviewcomment),
+        'is_public': 'false',
+        'language': 'english',
+        'received_compensation': 0,
+        'disable_comments': 1,
+        'sessionid': session.cookies.get('sessionid', domain='store.steampowered.com')
     }
     session.post(reviewurl, data=reviewdict, headers=functions.header)
     pass
+
 
 if __name__ == '__main__':
     main()

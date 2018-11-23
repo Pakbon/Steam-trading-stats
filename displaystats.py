@@ -29,12 +29,13 @@ def profilepost(stats, boosterpacks):
     payload['rgShowcaseConfig[8][0][notes]'] += '\n2nd most traded set: [b]{}[/b]'.format(stats[0]['second_most_traded_set'][:-13].decode('utf-8'))
     payload['rgShowcaseConfig[8][0][notes]'] += '\n\nMisc:'
     payload['rgShowcaseConfig[8][0][notes]'] += '\nBoosterpacks received: [b]{}[/b]'.format(len(boosterpacks))
+    '''
     try:
         loadfile = shelve.open('paydaytwo.shv')
         payload['rgShowcaseConfig[8][0][notes]'] += '\nTimes commented on Payday 2 news: [b]{}[/b]'.format(loadfile[functions.Yday.date().strftime('%Y-%m-%d')])
     except KeyError:
         payload['rgShowcaseConfig[8][0][notes]'] += '\nTimes commented on Payday 2 news: [b]0[/b]'
-
+    '''
     creds = functions.login(steam['bot'],steam['username'],steam['password'])
     payload['sessionID'] = creds.cookies.get('sessionid', domain='steamcommunity.com')
     url = 'https://steamcommunity.com/id/{}/edit'.format(steam['vanityurl'])
