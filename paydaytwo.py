@@ -35,13 +35,16 @@ def main():
 def article():
     #find the latest article posted
     appid = 'appid=218620'
-    count = 'count=1'
+    count = 'count=5'
     maxlength = 'maxlength=1'
     url = 'https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?{}&{}&{}'.format(appid, count, maxlength)
     newsreq = requests.get(url, headers=functions.header)
     newsreq = newsreq.json()
-
-    announceurl = newsreq['appnews']['newsitems'][0]['url']
+    for announcements in newsreq['appnews']['newsitems']:
+        if announcements['feedname'] == 'steam_community_announcements':
+            announceurl = announcements['url']
+        else:
+            continue
     announce = requests.get(announceurl, headers=functions.header)
     return announce.url, announce.text
 
@@ -50,7 +53,7 @@ def comments(art):
     #filter for comment
     #if found, return name of commenter
     soup = bs(art, features='html.parser')
-    replies = soup.select('.commentthread_comment')
+    replies = soup.select('.commentthread_comments')
     
     regex = replies[0].find(string=re.compile(r'^[\s]*(((d[ea]{1,2}d)|([game]{3,4})).?){2}', re.IGNORECASE))
     if regex:
