@@ -19,9 +19,9 @@ def main():
         if found:
             creds = functions.login(steam['bot'],steam['username'],steam['password'])
             commenter(creds, announceurl, found, options=options)
-            savefile = shelve.open('paydaytwo.shv')                
+            savefile = shelve.open('paydaytwo.shv')
             try:
-                savefile[functions.Tday.date().strftime('%Y-%m-%d')] += 1                
+                savefile[functions.Tday.date().strftime('%Y-%m-%d')] += 1
             except:
                 savefile[functions.Tday.date().strftime('%Y-%m-%d')] = 1
             break   
@@ -43,6 +43,7 @@ def article():
     for announcements in newsreq['appnews']['newsitems']:
         if announcements['feedname'] == 'steam_community_announcements':
             announceurl = announcements['url']
+            break
         else:
             continue
     announce = requests.get(announceurl, headers=functions.header)
@@ -64,12 +65,12 @@ def comments(art):
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 1
-    
+
     regex = replies[0].find(string=re.compile(r'^[\s](d[ea]{1,2}d bain)[\s]*', re.IGNORECASE))
     if regex:
         name = replies[0].bdi.contents[0]
         return name, 2
-    
+
     regex = replies[0].find(string=re.compile(r'^[\s](a?li[vf]{1}e|und[ea]{1,2}d) [game]{3,4}[\s]*', re.IGNORECASE))
     if regex:
         name = replies[0].bdi.contents[0]
