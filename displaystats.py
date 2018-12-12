@@ -17,7 +17,6 @@ def getdata():
     boosterpacks = functions.read_sql('boosterpack', where="date=\'{}\'".format(functions.Yday.date()))
     return stats, boosterpacks
 
-#def profilepost(stats):
 def profilepost(stats, boosterpacks):
     with open('x.json') as file:
         payload = json.loads(file.read())
