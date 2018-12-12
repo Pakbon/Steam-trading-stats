@@ -6,3 +6,4 @@ log/
 __pycache__/
 mailsend.py
 *.shv.*
+bphistory.py
