@@ -14,9 +14,11 @@ Tday = datetime.datetime.now()
 Yday = Tday.replace(hour=0,minute=1,second=0,microsecond=0) - datetime.timedelta(1) #tracking YESTERDAY's haul
 YdayUnix = Yday.timestamp()
 
-header = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-          ' AppleWebKit/537.36 (KHTML, like Gecko)'
-          ' Chrome/68.0.3440.84 Safari/537.36'}
+header = {
+    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+    ' AppleWebKit/537.36 (KHTML, like Gecko)'
+    ' Chrome/68.0.3440.84 Safari/537.36'
+}
 
 def login(bot, username, password):
     'logs into steam, returns requests session with chrome headers and relevant cookies'

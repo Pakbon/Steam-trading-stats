@@ -67,11 +67,11 @@ def mosttradedset(tradehist):
         idargs += '&classid{}={}'.format(counter, i)
         counter += 1
         if counter == 7:
-            r = requests.get(url+args+idargs)
-            r = r.json()
-            for n in r['result']:
+            req = requests.get(url+args+idargs)
+            req = req.json()
+            for n in req['result']:
                 try:
-                    cardset = r['result'][n]['type']
+                    cardset = req['result'][n]['type']
                 except:
                     continue
                 dictio.setdefault(cardset, 0)
