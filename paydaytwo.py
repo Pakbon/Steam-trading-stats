@@ -54,7 +54,7 @@ def comments(art):
     #filter for comment
     #if found, return name of commenter
     soup = bs(art, features='html.parser')
-    replies = soup.select('.commentthread_comments')
+    replies = soup.select('.commentthread_comment')
     
     regex = replies[0].find(string=re.compile(r'^[\s]*(((d[ea]{1,2}d)|([game]{3,4})).?){2}', re.IGNORECASE))
     if regex:
