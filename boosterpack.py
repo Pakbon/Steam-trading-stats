@@ -85,10 +85,17 @@ def boosterpacks():
                 games = soup.select('.booster_eligibility_game')
                 games = len(games)
             
+            #how many accounts own this game
+            asfapi = '{}oa%20{}'.format(steam['asfcommand'], boosterappid)
+            resp = requests.post(asfapi, data='')
+            resp = resp.json()
+            regex = re.compile(r'(?<=<ASF>\s).*(?=/.*\sbots)')
+            bot_owns = int(regex.findall(resp))
+
             #write data to sql
             logging.debug('Writing to SQL')
-            columns = 'date, boosterpack, min_owners, max_owners, received_from, level, eligible_games'
-            values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Tday, game_name, owners_min, owners_max, steamid, level, games)
+            columns = 'date, boosterpack, min_owners, max_owners, received_from, level, eligible_games, owned_on_bots'
+            values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Tday, game_name, owners_min, owners_max, steamid, level, games, bot_owns)
             functions.write_sql('boosterpack', columns, values)
 
         else: #no boosterpacks left
@@ -99,8 +106,8 @@ def boosterpacks():
 def extract():
     'unpacks boosterpacks via ASF'
     steam = functions.load_id()
-    url = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
-    resp = requests.post(url, data='')
+    asfapi = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
+    resp = requests.post(asfapi, data='')
     resp = resp.json()
     if resp['Success']:	
         return 0
