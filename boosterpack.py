@@ -4,6 +4,7 @@ import json
 import csv
 import datetime
 import logging
+import traceback
 
 from bs4 import BeautifulSoup as bs
 
@@ -14,10 +15,16 @@ logging.debug('log start')
 steam = functions.load_id()
 
 def main():
-    boosteramount = boosterpacks()
-    if boosteramount > 0:
-        extract()
-    logging.debug('log end')
+    try:
+        boosteramount = boosterpacks()
+        if boosteramount > 0:
+            extract()
+        logging.debug('log end\n')
+    except:
+        logging.debug('Exception ocurred')
+        logging.debug(traceback.format_exc())
+        logging.debug('log end\n')
+        
 
 def boosterpacks():
     'count boosterpacks'
@@ -90,7 +97,8 @@ def boosterpacks():
             resp = requests.post(asfapi, data='')
             resp = resp.json()
             regex = re.compile(r'(?<=<ASF>\s).*(?=/.*\sbots)')
-            bot_owns = int(regex.findall(resp))
+            bot_owns = regex.search(resp['Result'])
+            bot_owns = bot_owns.group()
 
             #write data to sql
             logging.debug('Writing to SQL')
@@ -106,6 +114,7 @@ def boosterpacks():
 def extract():
     'unpacks boosterpacks via ASF'
     steam = functions.load_id()
+    logging.debug('unpacking boosterpack')
     asfapi = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
     resp = requests.post(asfapi, data='')
     resp = resp.json()
