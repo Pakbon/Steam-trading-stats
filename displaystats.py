@@ -9,7 +9,7 @@ import traceback
 
 steam = functions.load_id()
 loglevel = 'logging.{}'.format(steam['logging'])
-logging.basicConfig(filename='displaystats.log', level=loglevel, format=' %(asctime)s - %(levelname)s- %(message)s')
+logging.basicConfig(filename='displaystats.log', level=exec(loglevel), format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
         logging.debug('log start')

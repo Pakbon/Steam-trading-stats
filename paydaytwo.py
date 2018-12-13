@@ -13,7 +13,7 @@ import functions
 
 steam = functions.load_id()
 loglevel = 'logging.{}'.format(steam['logging'])
-logging.basicConfig(filename='paydaytwo.log', level=loglevel, format=' %(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename='paydaytwo.log', level=exec(loglevel), format=' %(asctime)s - %(levelname)s - %(message)s')
 
 def main():
     counter = 0
