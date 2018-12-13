@@ -10,20 +10,16 @@ from bs4 import BeautifulSoup as bs
 
 import functions
 
-logging.basicConfig(filename='boosterpack.log', level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
-logging.debug('log start')
 steam = functions.load_id()
+loglevel = 'logging.{}'.format(steam['logging'])
+logging.basicConfig(filename='boosterpack.log', level=exec(loglevel), format=' %(asctime)s - %(levelname)s - %(message)s')
 
 def main():
-    try:
-        boosteramount = boosterpacks()
-        if boosteramount > 0:
-            extract()
-        logging.debug('log end\n')
-    except:
-        logging.debug('Exception ocurred')
-        logging.debug(traceback.format_exc())
-        logging.debug('log end\n')
+    logging.debug('log start')
+    boosteramount = boosterpacks()
+    if boosteramount > 0:
+        extract()
+    logging.debug('log end')
         
 
 def boosterpacks():
@@ -38,6 +34,7 @@ def boosterpacks():
     logging.debug('looking for boosterpacks in inventory')
     boosteramount = 0
     for items in inventory['descriptions']:
+        logging.debug('Item type of item: {}'.format(items['type']))
         steamid = ''
         if items['classid'] == '667924416': #gems break the script and can be safely skipped
             continue
@@ -101,19 +98,18 @@ def boosterpacks():
             bot_owns = bot_owns.group()
 
             #write data to sql
-            logging.debug('Writing to SQL')
+            logging.debug('Writing to SQL, values: {},{},{},{},{},{},{}'.format(game_name, owners_min, owners_max, steamid, level, games, bot_owns))
             columns = 'date, boosterpack, min_owners, max_owners, received_from, level, eligible_games, owned_on_bots'
             values = "\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\'".format(functions.Tday, game_name, owners_min, owners_max, steamid, level, games, bot_owns)
             functions.write_sql('boosterpack', columns, values)
 
         else: #no boosterpacks left
-            logging.debug('no more boosterpacks left')
+            logging.debug('no boosterpacks left')
             break    
     return boosteramount
 
 def extract():
     'unpacks boosterpacks via ASF'
-    steam = functions.load_id()
     logging.debug('unpacking boosterpack')
     asfapi = '{}unpack%20{}'.format(steam["asfcommand"], steam["bot"])
     resp = requests.post(asfapi, data='')
@@ -124,4 +120,8 @@ def extract():
         return 1
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        logging.warning('Exception ocurred')
+        logging.warning(traceback.format_exc())

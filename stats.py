@@ -8,20 +8,27 @@ import statistics
 import datetime
 import re
 from bs4 import BeautifulSoup as bs
+import traceback
+import logging
 
 import functions
 
 steam = functions.load_id()
+loglevel = 'logging.{}'.format(steam['logging'])
+logging.basicConfig(filename='stats.log', level=loglevel, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
-    tradehist = functions.tradedata()
-    statsdict = stats(tradehist)
-    statsdict.update(mosttradedset(tradehist))
-    statsdict.update(otherstats(tradehist))
-    #miscstats = misc(tradehist)
-    sql(statsdict)
+        logging.debug('log start')
+        tradehist = functions.tradedata()
+        statsdict = stats(tradehist)
+        statsdict.update(mosttradedset(tradehist))
+        statsdict.update(otherstats(tradehist))
+        #miscstats = misc(tradehist)
+        sql(statsdict)
+        logging.debug('log end')
 
 def stats(tradehist):
+    logging.debug('calculating stats')
     'calculating all kinds of stats about trades. Declined trades are not included in steam api'
     #amount of trades
     dailytrades = len([i for i in tradehist['response']['trades'] if int(i['steamid_other']) not in steam['exceptions']])
@@ -159,6 +166,7 @@ def misc(tradehist):
     return friend, comment
 
 def sql(stats):
+    logging.debug('writing to sql')
     functions.write_sql('stats', \
                         'date, total_trades, \
                         daily_trades, average_cards_per_trade, \
@@ -197,4 +205,8 @@ def sql(stats):
                             
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        logging.warning('Exception ocurred')
+        logging.warning(traceback.format_exc())
