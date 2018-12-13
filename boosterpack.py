@@ -10,21 +10,22 @@ from bs4 import BeautifulSoup as bs
 
 import functions
 
-logging.basicConfig(filename='boosterpack.log', level=logging.DEBUG, format=' %(asctime)s - %(levelname)s - %(message)s')
-logging.debug('log start')
 steam = functions.load_id()
+loglevel = 'logging.{}'.format(steam['logging'])
+logging.basicConfig(filename='boosterpack.log', level=loglevel, format=' %(asctime)s - %(levelname)s - %(message)s')
 
 def main():
+    logging.debug('log start')
     try:
         boosteramount = boosterpacks()
         if boosteramount > 0:
             extract()
         logging.debug('log end\n')
     except:
-        logging.debug('Exception ocurred')
-        logging.debug(traceback.format_exc())
-        logging.debug('log end\n')
-        
+        logging.warning('Exception ocurred')
+        logging.warning(traceback.format_exc())
+    finally:
+        logging.debug('log end')        
 
 def boosterpacks():
     'count boosterpacks'

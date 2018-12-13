@@ -6,10 +6,14 @@ import shelve
 from bs4 import BeautifulSoup as bs
 from random import choice
 from time import sleep
+import logging
+import traceback
 
 import functions
 
 steam = functions.load_id()
+loglevel = 'logging.{}'.format(steam['logging'])
+logging.basicConfig(filename='paydaytwo.log', level=loglevel, format=' %(asctime)s - %(levelname)s - %(message)s')
 
 def main():
     counter = 0
@@ -92,4 +96,8 @@ def commenter(creds, announceurl, name, options=0):
     payload = {'comment' : '@' + name + '\n' + choice(phrases[options]), 'count' : 10, 'sessionid' : creds.cookies.get('sessionid', domain='steamcommunity.com'), 'extended_data': {'appid':218620}, 'feature2': -1}
     creds.post(url, headers=functions.header, data=payload)
 
-main()
+try:
+    main()
+except:
+    logging.warning('Exception ocurred')
+    logging.warning(traceback.format_exc())

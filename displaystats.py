@@ -4,12 +4,18 @@ import requests
 import functions
 import json
 import shelve
+import logging
+import traceback
 
 steam = functions.load_id()
+loglevel = 'logging.{}'.format(steam['logging'])
+logging.basicConfig(filename='displaystats.log', level=loglevel, format=' %(asctime)s - %(levelname)s- %(message)s')
 
 def main():
-    stats, boosterpacks = getdata()
-    profilepost(stats, boosterpacks)
+        logging.debug('log start')
+        stats, boosterpacks = getdata()
+        profilepost(stats, boosterpacks)
+        logging.debug('log end')
 
 def getdata():
     'data to be shown on profile'
@@ -42,4 +48,9 @@ def profilepost(stats, boosterpacks):
     creds.post(url,data=payload, headers=functions.header)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        logging.warning('Exception ocurred')
+        logging.warning(traceback.format_exc())
+    
