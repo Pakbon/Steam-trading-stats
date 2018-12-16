@@ -8,8 +8,27 @@ import logging
 import traceback
 
 steam = functions.load_id()
-loglevel = 'logging.{}'.format(steam['logging'])
-logging.basicConfig(filename='displaystats.log', level=exec(loglevel), format=' %(asctime)s - %(levelname)s- %(message)s')
+
+if "logging" not in steam or steam['logging'] is None:
+    log_level = logging.NOTSET
+elif steam[ "logging" ] in (
+    "CRITICAL",
+    "DEBUG",
+    "ERROR",
+    "FATAL",
+    "INFO",
+    "WARN",
+    "WARNING",
+    "NOTSET",
+):
+    log_level = getattr( logging, steam[ "logging" ] )
+else:
+    raise ValueError( "Unknown logging level %r" % (
+        steam[ "logging" ],
+    ))
+log_level = getattr(logging, steam['logging'])
+logging.basicConfig(filename='displaystats.log', level=log_level, format=' %(asctime)s - %(levelname)s- %(message)s')
+
 
 def main():
         logging.debug('log start')

@@ -11,8 +11,27 @@ from bs4 import BeautifulSoup as bs
 import functions
 
 steam = functions.load_id()
-loglevel = 'logging.{}'.format(steam['logging'])
-logging.basicConfig(filename='boosterpack.log', level=exec(loglevel), format=' %(asctime)s - %(levelname)s - %(message)s')
+
+if "logging" not in steam or steam['logging'] is None:
+    log_level = logging.NOTSET
+elif steam[ "logging" ] in (
+    "CRITICAL",
+    "DEBUG",
+    "ERROR",
+    "FATAL",
+    "INFO",
+    "WARN",
+    "WARNING",
+    "NOTSET",
+):
+    log_level = getattr( logging, steam[ "logging" ] )
+else:
+    raise ValueError( "Unknown logging level %r" % (
+        steam[ "logging" ],
+    ))
+log_level = getattr(logging, steam['logging'])
+logging.basicConfig(filename='boosterpack.log', level=log_level, format=' %(asctime)s - %(levelname)s- %(message)s')
+print(type(log_level))
 
 def main():
     logging.debug('log start')
